@@ -1,0 +1,68 @@
+{
+  "label_rule": "is_laku = 1 jika count_sold > cat_sold_median (train only)",
+  "aggregation_level": "category_main",
+  "train_only_stats": true,
+  "train_categories": [
+    "elektronik",
+    "hiburan",
+    "olahraga",
+    "kecantikan",
+    "makanan_minuman",
+    "fashion",
+    "pertukangan"
+  ],
+  "supported_categories": [
+    "elektronik",
+    "hiburan",
+    "olahraga",
+    "kecantikan",
+    "makanan_minuman",
+    "fashion",
+    "pertukangan"
+  ],
+  "best_model": "XGB Tuned",
+  "calibration": "sigmoid (CalibratedClassifierCV, cv=prefit, test_size=0.3)",
+  "test_auc": 0.7596,
+  "random_state": 42,
+  "feature_cols": [
+    "log_price",
+    "log_price_vs_cat",
+    "price_rank_in_cat",
+    "price_diff_median",
+    "rating_average",
+    "has_discount",
+    "discount_pct",
+    "stock_rank_in_cat",
+    "stock_is_enough",
+    "stock_price_ratio",
+    "is_topads",
+    "is_jakarta",
+    "trust_factor",
+    "cat_median_price",
+    "cat_stock_median",
+    "cat_pct_official",
+    "cat_elektronik",
+    "cat_hiburan",
+    "cat_olahraga",
+    "cat_kecantikan",
+    "cat_makanan_minuman",
+    "cat_fashion",
+    "cat_pertukangan"
+  ],
+  "n_features": 23,
+  "removed_features": [
+    "is_official — digabung ke trust_factor"
+  ],
+  "added_features": [
+    "rating_average",
+    "is_topads",
+    "has_discount",
+    "discount_pct"
+  ],
+  "known_limitations": {
+    "pertukangan": "800 baris sintetik dengan distribusi lognormal; cat_sold_median=49",
+    "is_topads": "Hanya ~50 sampel topads di dataset; sinyal lemah",
+    "cv_test_gap": "Gap ~0.04 disebabkan distribusi sintetik vs data asli",
+    "auc_ceiling": "AUC ~0.76 adalah batas wajar untuk fitur tabular tanpa data review/ranking"
+  }
+}
