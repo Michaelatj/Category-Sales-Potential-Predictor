@@ -4,7 +4,7 @@ A machine learning project for helping UMKM sellers estimate whether a product h
 
 ## Overview
 
-This notebook builds a tabular classification model that predicts whether a product is likely to sell well (`Laku`) or not (`Tidak Laku`) based on marketplace product attributes such as price, stock, discount, rating, store trust signals, and category-level statistics.
+This project builds a tabular classification model that predicts whether a product is likely to sell well (`Laku`) or not (`Tidak Laku`) based on marketplace product attributes such as price, stock, discount, rating, store trust signals, and category-level statistics.
 
 The project is part of **UMKMentor**, an AI for Business Intelligence and Market Insights solution for UMKM sellers.
 
@@ -28,7 +28,6 @@ The project uses the **Tokopedia Product and Review Dataset**.
 - **Reviews:** 1M+
 - **Categories:** 24 product categories
 - **Language:** Indonesian
-- **Collection period:** 2025
 
 ### Main Files
 - `tokopedia_products_with_review.csv`
@@ -75,9 +74,12 @@ In the notebook, the raw data was cleaned and reduced to a final modeling table.
 ### Final Modeling Dataset
 - **Initial loaded rows:** 6,353
 - **Final cleaned rows:** 3,039
-- **Final features:** 23
+- **Final features:** 22
 - **Train set:** 2,431 rows
 - **Test set:** 608 rows
+
+### Additional Synthetic Data
+To support a category that did not exist in the original dataset, the notebook includes **800 rows of synthetic data for the `pertukangan` category**.
 
 ### Label Definition
 The target label is created as:
@@ -97,33 +99,35 @@ The notebook creates features that capture business context, including:
 - stock sufficiency
 - discount presence
 - discount percentage
-- trust factor
+- store trust signals
 - category one-hot encoding
 
+### Feature Audit
+During model refinement, the feature set was adjusted to improve consistency with real inference use:
+- `TopAds` was removed from model inputs
+- `gold_merchant` was added as an explicit feature
+- `is_official` was kept as a direct trust feature
+- ambiguous derived features such as `trust_factor` were simplified
+
 ### Final Feature Set
-Total final features used by the model: **23**
+Total final features used by the model: **22**
 
 ## Models Tested
 
-The notebook compares several tree-based and linear models:
+The notebook compares several models, including:
+- Logistic Regression
+- Support Vector Machine (SVM)
 - Random Forest
 - Gradient Boosting
-- XGBoost
-- Logistic Regression
 
 ## Best Model
 
 The final selected model is:
 
-**XGBoost tuned + calibrated (sigmoid)**
+**Gradient Boosting tuned + calibrated (sigmoid)**
 
 ### Final Performance
-- **Cross-validation mean AUC:** 0.799
-- **Cross-validation std:** 0.015
-- **Test AUC:** 0.760
-- **CV-Test gap:** 0.039
-
-The notebook also reports classification metrics, ROC curve, Precision-Recall curve, calibration curve, feature importance, and SHAP explanation.
+- **Test AUC:** 0.745
 
 ## Key Insights from the Notebook
 
@@ -132,9 +136,15 @@ The strongest signals in the model include:
 - `rating_average`
 - `stock_is_enough`
 - `cat_pct_official`
-- category-level pattern such as `cat_pertukangan`
+- category-level patterns such as `cat_pertukangan`
 
 This suggests that discount strategy, product rating, stock adequacy, and category context are important indicators for sales potential.
+
+## Explainability
+
+The notebook includes:
+- global model interpretability using SHAP / feature importance
+- business-rule-based recommendation messages in the inference flow
 
 ## Supported Categories
 
@@ -153,8 +163,8 @@ The notebook includes a `predict_product()` function that accepts:
 - product category
 - selling price
 - official store status
+- Gold Merchant status
 - stock
-- TopAds status
 - rating average
 - discounted price
 
@@ -163,6 +173,8 @@ It returns:
 - probability score
 - risk level
 - simple business suggestions
+
+Note: the discount input is handled as **final price after discount**, not discount percentage.
 
 ## Exported Artifacts
 
@@ -182,7 +194,7 @@ The notebook exports the following files:
 - Pandas
 - NumPy
 - Scikit-learn
-- XGBoost
+- Gradient Boosting
 - Matplotlib
 - Seaborn
 - SHAP
@@ -201,7 +213,7 @@ This project helps UMKM sellers:
 
 A few limitations noted in the notebook:
 - some signals are weak in certain categories,
-- `is_topads` has limited examples,
+- TopAds can create misleading correlations in observational data,
 - synthetic data is used for the `pertukangan` category,
 - the model is still best treated as an MVP, not a production-grade forecasting system.
 
