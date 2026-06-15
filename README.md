@@ -1,10 +1,10 @@
 # UMKMentor — Product Success Predictor
 
-A machine learning project for helping UMKM sellers estimate whether a product has good sales potential before they decide to stock or promote it.
+A machine learning project that helps UMKM sellers estimate whether a product has good sales potential before they decide to stock or promote it.
 
 ## Overview
 
-This project builds a tabular classification model that predicts whether a product is likely to sell well (`Laku`) or not (`Tidak Laku`) based on marketplace product attributes such as price, stock, discount, rating, store trust signals, and category-level statistics.
+This notebook builds a tabular classification model that predicts whether a product is likely to sell well (`Laku`) or not (`Tidak Laku`) based on marketplace product attributes such as price, stock, discount, rating, trust signals, and category-level statistics.
 
 The project is part of **UMKMentor**, an AI for Business Intelligence and Market Insights solution for UMKM sellers.
 
@@ -13,7 +13,7 @@ The project is part of **UMKMentor**, an AI for Business Intelligence and Market
 Many UMKM sellers choose products based on trends or assumptions, not data. This increases the risk of:
 - choosing products with weak demand,
 - setting prices that are not competitive,
-- ignoring discount strategy,
+- using discount strategies without evidence,
 - underestimating the role of trust signals such as official store status and ratings.
 
 This model is designed to reduce that risk by giving a simple data-driven product potential prediction.
@@ -74,7 +74,7 @@ In the notebook, the raw data was cleaned and reduced to a final modeling table.
 ### Final Modeling Dataset
 - **Initial loaded rows:** 6,353
 - **Final cleaned rows:** 3,039
-- **Final features:** 22
+- **Final features:** 23
 - **Train set:** 2,431 rows
 - **Test set:** 608 rows
 
@@ -99,52 +99,67 @@ The notebook creates features that capture business context, including:
 - stock sufficiency
 - discount presence
 - discount percentage
-- store trust signals
+- trust factor
 - category one-hot encoding
 
-### Feature Audit
-During model refinement, the feature set was adjusted to improve consistency with real inference use:
-- `TopAds` was removed from model inputs
-- `gold_merchant` was added as an explicit feature
-- `is_official` was kept as a direct trust feature
-- ambiguous derived features such as `trust_factor` were simplified
+### Notable Feature Logic
+The notebook also builds category-level statistics such as:
+- `cat_median_price`
+- `cat_stock_median`
+- `cat_sold_median`
+- `cat_pct_official`
+- `cat_laku_rate`
+
+These statistics are used both for training and for the inference helper function.
 
 ### Final Feature Set
-Total final features used by the model: **22**
+Total final features used by the model: **23**
 
 ## Models Tested
 
-The notebook compares several models, including:
-- Logistic Regression
-- Support Vector Machine (SVM)
+The notebook compares several models:
 - Random Forest
 - Gradient Boosting
+- XGBoost
+- Logistic Regression
+- Linear SVM
 
 ## Best Model
 
 The final selected model is:
 
-**Gradient Boosting tuned + calibrated (sigmoid)**
+**XGBoost tuned + calibrated (sigmoid)**
 
 ### Final Performance
-- **Test AUC:** 0.745
+- **Best cross-validation AUC:** 0.799
+- **Test AUC:** 0.760
+- **Classification accuracy:** 0.68
+
+### Classification Report Highlights
+- `Tidak Laku`: precision 0.69, recall 0.69
+- `Laku`: precision 0.67, recall 0.66
 
 ## Key Insights from the Notebook
 
 The strongest signals in the model include:
 - `discount_pct`
+- `cat_pertukangan`
 - `rating_average`
 - `stock_is_enough`
 - `cat_pct_official`
-- category-level patterns such as `cat_pertukangan`
+- `stock_rank_in_cat`
+- `has_discount`
 
 This suggests that discount strategy, product rating, stock adequacy, and category context are important indicators for sales potential.
 
 ## Explainability
 
 The notebook includes:
-- global model interpretability using SHAP / feature importance
-- business-rule-based recommendation messages in the inference flow
+- feature importance analysis
+- SHAP summary plot bar chart
+- SHAP beeswarm plot
+
+SHAP is used for **global model interpretation** to understand which features influence predictions most strongly across the dataset.
 
 ## Supported Categories
 
@@ -163,7 +178,7 @@ The notebook includes a `predict_product()` function that accepts:
 - product category
 - selling price
 - official store status
-- Gold Merchant status
+- TopAds status
 - stock
 - rating average
 - discounted price
@@ -174,7 +189,7 @@ It returns:
 - risk level
 - simple business suggestions
 
-Note: the discount input is handled as **final price after discount**, not discount percentage.
+Note: the discount input is handled as the **final price after discount**, not the discount percentage.
 
 ## Exported Artifacts
 
@@ -194,7 +209,7 @@ The notebook exports the following files:
 - Pandas
 - NumPy
 - Scikit-learn
-- Gradient Boosting
+- XGBoost
 - Matplotlib
 - Seaborn
 - SHAP
@@ -213,7 +228,7 @@ This project helps UMKM sellers:
 
 A few limitations noted in the notebook:
 - some signals are weak in certain categories,
-- TopAds can create misleading correlations in observational data,
+- `is_topads` has limited examples,
 - synthetic data is used for the `pertukangan` category,
 - the model is still best treated as an MVP, not a production-grade forecasting system.
 
