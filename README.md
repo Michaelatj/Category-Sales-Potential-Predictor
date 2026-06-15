@@ -1,26 +1,28 @@
 # UMKMentor — Product Success Predictor
 
-A machine learning project that helps UMKM sellers estimate whether a product has good sales potential before they decide to stock or promote it.
+A machine learning project for helping UMKM sellers estimate whether a product has good sales potential before they decide to stock, price, or promote it.
 
 ## Overview
 
-This notebook builds a tabular classification model that predicts whether a product is likely to sell well (`Laku`) or not (`Tidak Laku`) based on marketplace product attributes such as price, stock, discount, rating, trust signals, and category-level statistics.
+This project builds a tabular classification model that predicts whether a product is likely to sell well (`Laku`) or not (`Tidak Laku`) based on marketplace attributes such as price, stock, discount, rating, store trust signals, and category-level statistics.
 
-The project is part of **UMKMentor**, an AI for Business Intelligence and Market Insights solution for UMKM sellers.
+The project is part of **UMKMentor**, an AI for Business Intelligence and Market Insights solution designed to help UMKM sellers make more data-driven product decisions.
 
 ## Problem Statement
 
-Many UMKM sellers choose products based on trends or assumptions, not data. This increases the risk of:
+Many UMKM sellers choose products based on trends or assumptions rather than data. This can increase the risk of:
+
 - choosing products with weak demand,
 - setting prices that are not competitive,
-- using discount strategies without evidence,
-- underestimating the role of trust signals such as official store status and ratings.
+- applying discounts without a clear strategy,
+- underestimating the effect of trust signals such as official store status and ratings,
+- making product decisions without understanding category-specific behavior.
 
-This model is designed to reduce that risk by giving a simple data-driven product potential prediction.
+This model is designed to reduce that risk by giving a simple, data-driven product success prediction.
 
 ## Dataset
 
-The project uses the **Tokopedia Product and Review Dataset**.
+The project uses the **Tokopedia Product and Review Dataset** as the main real-world source.
 
 ### Dataset Summary
 - **Source:** Tokopedia public product and review data
@@ -28,6 +30,7 @@ The project uses the **Tokopedia Product and Review Dataset**.
 - **Reviews:** 1M+
 - **Categories:** 24 product categories
 - **Language:** Indonesian
+- **Collection period:** 2025
 
 ### Main Files
 - `tokopedia_products_with_review.csv`
@@ -67,6 +70,30 @@ The dataset contains:
 - `review_like`
 - `bad_rating_reason`
 
+## Synthetic Dataset Extension
+
+The original Tokopedia dataset did not contain enough data for the **Pertukangan** category, while this category was required as one of the project use cases in UMKMentor.
+
+To address this limitation, the notebook adds **800 rows of synthetic data** for the **Pertukangan** category and merges them into the training dataset.
+
+### Why This Was Added
+The synthetic data was created to:
+- provide a category representation that was missing in the original dataset,
+- allow the model to learn patterns for Pertukangan products,
+- make the model usable for inference on categories that were otherwise absent,
+- support product success prediction in a broader UMKM business scenario.
+
+### Synthetic Data Characteristics
+The synthetic records were generated to resemble marketplace-style product data, including:
+- product price patterns,
+- stock variation,
+- discount behavior,
+- store trust attributes,
+- category-level sales patterns.
+
+### Important Limitation
+Because this category is synthetic and not fully sourced from the original Tokopedia data, predictions for **Pertukangan** should be interpreted more carefully than categories with full real-world coverage.
+
 ## Data Preparation
 
 In the notebook, the raw data was cleaned and reduced to a final modeling table.
@@ -74,12 +101,9 @@ In the notebook, the raw data was cleaned and reduced to a final modeling table.
 ### Final Modeling Dataset
 - **Initial loaded rows:** 6,353
 - **Final cleaned rows:** 3,039
-- **Final features:** 23
+- **Final features:** 22
 - **Train set:** 2,431 rows
 - **Test set:** 608 rows
-
-### Additional Synthetic Data
-To support a category that did not exist in the original dataset, the notebook includes **800 rows of synthetic data for the `pertukangan` category**.
 
 ### Label Definition
 The target label is created as:
@@ -89,81 +113,86 @@ The target label is created as:
 
 This means the model predicts whether a product performs above the median sales of its category.
 
+Using the category median makes the label more fair than comparing products across categories with very different sales distributions.
+
 ## Feature Engineering
 
-The notebook creates features that capture business context, including:
-- log price transformations
-- price position relative to category median
-- price rank inside category
-- stock rank inside category
-- stock sufficiency
-- discount presence
-- discount percentage
-- trust factor
-- category one-hot encoding
+The notebook creates features that capture both product-level and category-level business context.
 
-### Notable Feature Logic
-The notebook also builds category-level statistics such as:
-- `cat_median_price`
-- `cat_stock_median`
-- `cat_sold_median`
-- `cat_pct_official`
-- `cat_laku_rate`
+### Core Feature Ideas
+The final feature set includes:
+- log-transformed price features,
+- price position relative to category median,
+- price rank inside category,
+- stock rank inside category,
+- stock sufficiency,
+- discount presence,
+- discount percentage,
+- store trust signals,
+- category one-hot encoding,
+- category-level reference statistics.
 
-These statistics are used both for training and for the inference helper function.
+### Feature Refinement / Audit
+During model refinement, the feature set was adjusted to make the model more consistent with real-world inference behavior:
+
+- `is_topads` was removed from model inputs because it can create misleading correlations in observational marketplace data.
+- `gold_merchant` was added as an explicit trust-related feature.
+- `is_official` was kept as a direct trust feature.
+- ambiguous trust aggregation was simplified so the input features match the final deployment logic more cleanly.
 
 ### Final Feature Set
-Total final features used by the model: **23**
+Total final features used by the model: **22**
 
 ## Models Tested
 
-The notebook compares several models:
-- Random Forest
-- Gradient Boosting
-- XGBoost
+Several classification algorithms were evaluated, including:
+
 - Logistic Regression
 - Linear SVM
+- Random Forest
+- Gradient Boosting
+
+The notebook also includes tuning and calibration for the stronger models so that probability outputs are more stable and useful for decision support.
 
 ## Best Model
 
 The final selected model is:
 
-**XGBoost tuned + calibrated (sigmoid)**
+**Gradient Boosting tuned + calibrated (sigmoid)**
 
 ### Final Performance
-- **Best cross-validation AUC:** 0.799
-- **Test AUC:** 0.760
-- **Classification accuracy:** 0.68
-
-### Classification Report Highlights
-- `Tidak Laku`: precision 0.69, recall 0.69
-- `Laku`: precision 0.67, recall 0.66
+- **Test AUC:** 0.745
+- The model output is calibrated with sigmoid to improve probability interpretability.
 
 ## Key Insights from the Notebook
 
 The strongest signals in the model include:
 - `discount_pct`
-- `cat_pertukangan`
 - `rating_average`
 - `stock_is_enough`
 - `cat_pct_official`
-- `stock_rank_in_cat`
-- `has_discount`
+- category-level patterns such as `cat_pertukangan`
 
-This suggests that discount strategy, product rating, stock adequacy, and category context are important indicators for sales potential.
+This suggests that discount strategy, product rating, stock adequacy, and category context are important indicators of product success potential.
 
 ## Explainability
 
-The notebook includes:
-- feature importance analysis
-- SHAP summary plot bar chart
-- SHAP beeswarm plot
+The notebook includes explainability analysis using **SHAP** for global interpretation of the model.
 
-SHAP is used for **global model interpretation** to understand which features influence predictions most strongly across the dataset.
+### What SHAP Is Used For
+- identifying the most influential features overall,
+- understanding which variables generally push predictions up or down,
+- supporting model inspection after training.
+
+### What SHAP Is Not Used For
+The current inference output still uses **business-rule-based suggestions** for product guidance. In other words:
+- SHAP is used for **model interpretation**,
+- while the final user-facing recommendation text is still generated using rule-based logic in `predict_product()`.
 
 ## Supported Categories
 
 The inference function supports these category groups:
+
 - elektronik
 - hiburan
 - olahraga
@@ -175,25 +204,51 @@ The inference function supports these category groups:
 ## Inference
 
 The notebook includes a `predict_product()` function that accepts:
+
 - product category
 - selling price
 - official store status
-- TopAds status
+- Gold Merchant status
 - stock
 - rating average
 - discounted price
 
 It returns:
-- predicted label
-- probability score
-- risk level
-- simple business suggestions
+- predicted label,
+- probability score,
+- risk level,
+- simple business suggestions.
 
-Note: the discount input is handled as the **final price after discount**, not the discount percentage.
+### Important Input Note
+The discount input is handled as the **final price after discount** (`discounted_price`), not as a discount percentage.
+
+### Final Inference Logic
+The inference flow uses category statistics and trained feature logic to produce a prediction and a short recommendation message that can be shown in the website.
+
+## Integration Notes for Full Stack
+
+The website / backend should align with the final notebook logic:
+
+- `discounted_price` must be calculated before sending the request to the model.
+- `TopAds` should not be sent as a model input.
+- `gold_merchant` should be included in the UI / API input.
+- the model input structure should match the final `FEATURE_COLS` used in training.
+
+### Example Discount Conversion
+If the frontend receives:
+- `harga_jual = 48000`
+- `diskon_pct = 20`
+
+Then the backend should convert it to:
+
+`discounted_price = 48000 * (1 - 20 / 100) = 38400`
+
+and send that value into the model.
 
 ## Exported Artifacts
 
 The notebook exports the following files:
+
 - `tokped_classifier.pkl`
 - `feature_cols.json`
 - `category_levels.json`
@@ -209,7 +264,7 @@ The notebook exports the following files:
 - Pandas
 - NumPy
 - Scikit-learn
-- XGBoost
+- Gradient Boosting
 - Matplotlib
 - Seaborn
 - SHAP
@@ -226,18 +281,21 @@ This project helps UMKM sellers:
 
 ## Limitations
 
-A few limitations noted in the notebook:
-- some signals are weak in certain categories,
-- `is_topads` has limited examples,
+A few limitations remain in the current version:
+
+- some signals are weaker in certain categories,
+- `is_topads` can be misleading if treated as a causal feature,
 - synthetic data is used for the `pertukangan` category,
-- the model is still best treated as an MVP, not a production-grade forecasting system.
+- the model is still best treated as an MVP rather than a production-grade forecasting system,
+- product-level explanation text is still rule-based rather than fully SHAP-generated.
 
 ## How to Use
 
 1. Load the exported model and metadata files.
 2. Prepare input data using the same feature logic from the notebook.
-3. Call the `predict_product()` logic or the model directly.
-4. Use the probability score as a decision-support signal, not as an absolute truth.
+3. Convert discount input to `discounted_price` before inference.
+4. Call the `predict_product()` logic or the model directly.
+5. Use the probability score as a decision-support signal, not as an absolute truth.
 
 ## Project Context
 
