@@ -1,50 +1,50 @@
 # UMKMentor — Product Success Predictor
 
-A machine learning project for helping UMKM sellers estimate whether a product has good sales potential before they decide to stock, price, or promote it.
+Proyek machine learning untuk membantu pelaku UMKM memperkirakan apakah sebuah produk berpotensi **laku** atau **tidak laku** sebelum mereka memutuskan untuk stok, memberi diskon, atau mempromosikannya.
 
-## Overview
+## Gambaran Umum
 
-This project builds a tabular classification model that predicts whether a product is likely to sell well (`Laku`) or not (`Tidak Laku`) based on marketplace attributes such as price, stock, discount, rating, store trust signals, and category-level statistics.
+Proyek ini membangun model klasifikasi tabular yang memprediksi apakah suatu produk kemungkinan akan memiliki performa penjualan yang baik (`Laku`) atau tidak (`Tidak Laku`) berdasarkan atribut marketplace seperti harga, stok, diskon, rating, sinyal kepercayaan toko, dan statistik level kategori.
 
-The project is part of **UMKMentor**, an AI for Business Intelligence and Market Insights solution designed to help UMKM sellers make more data-driven product decisions.
+Proyek ini merupakan bagian dari **UMKMentor**, yaitu solusi AI untuk business intelligence dan market insights yang ditujukan untuk membantu pelaku UMKM mengambil keputusan produk secara lebih berbasis data.
 
-## Problem Statement
+## Permasalahan
 
-Many UMKM sellers choose products based on trends or assumptions rather than data. This can increase the risk of:
+Banyak pelaku UMKM memilih produk berdasarkan tren atau asumsi, bukan berdasarkan data. Hal ini bisa meningkatkan risiko:
 
-- choosing products with weak demand,
-- setting prices that are not competitive,
-- applying discounts without a clear strategy,
-- underestimating the effect of trust signals such as official store status and ratings,
-- making product decisions without understanding category-specific behavior.
+- memilih produk dengan permintaan yang lemah,
+- menetapkan harga yang kurang kompetitif,
+- memberi diskon tanpa strategi yang jelas,
+- mengabaikan sinyal kepercayaan seperti status official store dan rating,
+- mengambil keputusan produk tanpa memahami pola spesifik tiap kategori.
 
-This model is designed to reduce that risk by giving a simple, data-driven product success prediction.
+Model ini dirancang untuk mengurangi risiko tersebut dengan memberikan prediksi potensi produk yang sederhana namun berbasis data.
 
 ## Dataset
 
-The project uses the **Tokopedia Product and Review Dataset** as the main real-world source.
+Proyek ini menggunakan **Tokopedia Product and Review Dataset** sebagai sumber data real-world utama.
 
-### Dataset Summary
-- **Source:** Tokopedia public product and review data
-- **Products:** 5,553
-- **Reviews:** 1M+
-- **Categories:** 24 product categories
-- **Language:** Indonesian
-- **Collection period:** 2025
+### Ringkasan Dataset
+- **Sumber:** data publik produk dan review Tokopedia
+- **Jumlah produk:** 5.553
+- **Jumlah review:** 1M+
+- **Jumlah kategori:** 24 kategori produk
+- **Bahasa:** Indonesia
+- **Periode pengumpulan:** 2025
 
-### Main Files
+### File Utama
 - `tokopedia_products_with_review.csv`
 - `tokopedia_products_with_review.json`
 
-### Dataset Content
-The dataset contains:
-- product information
-- pricing information
-- sales-related information
-- store attributes
-- review texts and ratings
+### Isi Dataset
+Dataset memuat:
+- informasi produk,
+- informasi harga,
+- informasi penjualan,
+- atribut toko,
+- teks review dan rating.
 
-### Important Product Columns
+### Kolom Produk Penting
 - `product_id`
 - `category`
 - `name`
@@ -59,7 +59,7 @@ The dataset contains:
 - `rating_average`
 - `shop_location`
 
-### Review Columns
+### Kolom Review
 - `review_id`
 - `variant_name`
 - `message`
@@ -70,128 +70,131 @@ The dataset contains:
 - `review_like`
 - `bad_rating_reason`
 
-## Synthetic Dataset Extension
+## Ekstensi Dataset Sintetis
 
-The original Tokopedia dataset did not contain enough data for the **Pertukangan** category, while this category was required as one of the project use cases in UMKMentor.
+Dataset Tokopedia asli tidak memiliki representasi yang cukup untuk kategori **Pertukangan**, padahal kategori ini dibutuhkan sebagai salah satu use case dalam UMKMentor.
 
-To address this limitation, the notebook adds **800 rows of synthetic data** for the **Pertukangan** category and merges them into the training dataset.
+Untuk mengatasi keterbatasan tersebut, notebook menambahkan **800 baris data sintetis** untuk kategori **Pertukangan** dan menggabungkannya ke dalam dataset pelatihan.
 
-### Why This Was Added
-The synthetic data was created to:
-- provide a category representation that was missing in the original dataset,
-- allow the model to learn patterns for Pertukangan products,
-- make the model usable for inference on categories that were otherwise absent,
-- support product success prediction in a broader UMKM business scenario.
+### Alasan Penambahan
+Data sintetis ini dibuat untuk:
+- menyediakan representasi kategori yang belum tersedia pada dataset asli,
+- memungkinkan model mempelajari pola untuk produk Pertukangan,
+- membuat model tetap bisa digunakan untuk inferensi pada kategori yang sebelumnya tidak punya data memadai,
+- mendukung skenario prediksi produk yang lebih luas dalam konteks UMKM.
 
-### Synthetic Data Characteristics
-The synthetic records were generated to resemble marketplace-style product data, including:
-- product price patterns,
-- stock variation,
-- discount behavior,
-- store trust attributes,
-- category-level sales patterns.
+### Karakteristik Data Sintetis
+Data sintetis dibuat agar menyerupai pola data marketplace, termasuk:
+- pola harga produk,
+- variasi stok,
+- perilaku diskon,
+- atribut kepercayaan toko,
+- pola penjualan pada level kategori.
 
-### Important Limitation
-Because this category is synthetic and not fully sourced from the original Tokopedia data, predictions for **Pertukangan** should be interpreted more carefully than categories with full real-world coverage.
+### Keterbatasan
+Karena kategori ini bersifat sintetis dan bukan sepenuhnya berasal dari data Tokopedia asli, prediksi untuk kategori **Pertukangan** perlu ditafsirkan dengan lebih hati-hati dibanding kategori yang seluruhnya didukung data real-world.
 
-## Data Preparation
+## Persiapan Data
 
-In the notebook, the raw data was cleaned and reduced to a final modeling table.
+Pada notebook, data mentah dibersihkan dan direduksi menjadi tabel final untuk pemodelan.
 
-### Final Modeling Dataset
-- **Initial loaded rows:** 6,353
-- **Final cleaned rows:** 3,039
-- **Final features:** 22
-- **Train set:** 2,431 rows
-- **Test set:** 608 rows
+### Dataset Final untuk Modeling
+- **Baris awal yang dimuat:** 6.353
+- **Baris final setelah cleaning:** 3.039
+- **Jumlah fitur final:** 22
+- **Train set:** 2.431 baris
+- **Test set:** 608 baris
 
-### Label Definition
-The target label is created as:
+### Definisi Label
+Target label dibentuk sebagai:
 
-`is_laku = 1` if `count_sold > cat_sold_median`  
-`is_laku = 0` otherwise
+`is_laku = 1` jika `count_sold > cat_sold_median`  
+`is_laku = 0` selain itu
 
-This means the model predicts whether a product performs above the median sales of its category.
+Artinya model memprediksi apakah sebuah produk memiliki performa penjualan di atas median kategori tersebut.
 
-Using the category median makes the label more fair than comparing products across categories with very different sales distributions.
+Penggunaan median per kategori membuat label lebih adil dibanding membandingkan produk lintas kategori yang pola penjualannya sangat berbeda.
 
 ## Feature Engineering
 
-The notebook creates features that capture both product-level and category-level business context.
+Notebook ini membangun fitur-fitur yang menangkap konteks bisnis di marketplace.
 
-### Core Feature Ideas
-The final feature set includes:
-- log-transformed price features,
-- price position relative to category median,
-- price rank inside category,
-- stock rank inside category,
-- stock sufficiency,
-- discount presence,
-- discount percentage,
-- store trust signals,
-- category one-hot encoding,
-- category-level reference statistics.
+### Ide Fitur Utama
+Fitur final mencakup:
+- transformasi log pada harga,
+- posisi harga relatif terhadap median kategori,
+- ranking harga di dalam kategori,
+- ranking stok di dalam kategori,
+- kecukupan stok,
+- keberadaan diskon,
+- persentase diskon,
+- sinyal kepercayaan toko,
+- one-hot encoding kategori,
+- statistik referensi level kategori.
 
-### Feature Refinement / Audit
-During model refinement, the feature set was adjusted to make the model more consistent with real-world inference behavior:
+### Audit dan Perbaikan Fitur
+Selama proses pengembangan model, dilakukan penyesuaian fitur agar lebih konsisten dengan perilaku inferensi di dunia nyata:
 
-- `is_topads` was removed from model inputs because it can create misleading correlations in observational marketplace data.
-- `gold_merchant` was added as an explicit trust-related feature.
-- `is_official` was kept as a direct trust feature.
-- ambiguous trust aggregation was simplified so the input features match the final deployment logic more cleanly.
+- `is_topads` dihapus dari input model karena dapat menimbulkan korelasi yang menyesatkan pada data observasional marketplace.
+- `gold_merchant` ditambahkan sebagai fitur kepercayaan yang berdiri sendiri.
+- `is_official` tetap dipakai sebagai fitur trust yang langsung.
+- pendekatan trust yang terlalu ambigu disederhanakan agar input model lebih selaras dengan logika deployment.
 
-### Final Feature Set
-Total final features used by the model: **22**
+### Jumlah Fitur Final
+Total fitur final yang digunakan model: **22**
 
-## Models Tested
+## Model yang Dicoba
 
-Several classification algorithms were evaluated, including:
+Beberapa algoritma klasifikasi diuji dalam notebook, yaitu:
 
 - Logistic Regression
 - Linear SVM
 - Random Forest
 - Gradient Boosting
 
-The notebook also includes tuning and calibration for the stronger models so that probability outputs are more stable and useful for decision support.
+Selain itu, model juga dituning dan dikalibrasi agar output probabilitas lebih stabil dan berguna untuk decision support.
 
-## Best Model
+## Model Terbaik
 
-The final selected model is:
+Model final yang dipilih adalah:
 
-**Gradient Boosting tuned + calibrated (sigmoid)**
+**Gradient Boosting yang sudah dituning dan dikalibrasi (sigmoid)**
 
-### Final Performance
+### Performa Final
 - **Test AUC:** 0.745
-- The model output is calibrated with sigmoid to improve probability interpretability.
+- Output probabilitas dikalibrasi dengan sigmoid agar lebih mudah diinterpretasikan.
 
-## Key Insights from the Notebook
+## Insight Utama dari Notebook
 
-The strongest signals in the model include:
+Sinyal paling kuat yang terlihat pada model antara lain:
 - `discount_pct`
 - `rating_average`
 - `stock_is_enough`
 - `cat_pct_official`
-- category-level patterns such as `cat_pertukangan`
+- pola kategori seperti `cat_pertukangan`
 
-This suggests that discount strategy, product rating, stock adequacy, and category context are important indicators of product success potential.
+Hal ini menunjukkan bahwa strategi diskon, rating produk, kecukupan stok, dan konteks kategori merupakan indikator penting untuk memprediksi potensi produk laku.
 
 ## Explainability
 
-The notebook includes explainability analysis using **SHAP** for global interpretation of the model.
+Notebook ini menggunakan **SHAP** untuk interpretasi global model.
 
-### What SHAP Is Used For
-- identifying the most influential features overall,
-- understanding which variables generally push predictions up or down,
-- supporting model inspection after training.
+### Fungsi SHAP di Proyek Ini
+SHAP digunakan untuk:
+- melihat fitur mana yang paling berpengaruh secara keseluruhan,
+- memahami arah pengaruh fitur terhadap prediksi,
+- membantu inspeksi model setelah training.
 
-### What SHAP Is Not Used For
-The current inference output still uses **business-rule-based suggestions** for product guidance. In other words:
-- SHAP is used for **model interpretation**,
-- while the final user-facing recommendation text is still generated using rule-based logic in `predict_product()`.
+### Batasan SHAP pada Implementasi Saat Ini
+Pada notebook final, teks rekomendasi untuk user di fungsi `predict_product()` masih berasal dari **logika aturan bisnis (rule-based)**.
 
-## Supported Categories
+Jadi:
+- SHAP dipakai untuk **analisis interpretabilitas model**,
+- sedangkan saran yang tampil di inferensi masih dihasilkan oleh aturan bisnis yang ditulis di fungsi prediksi.
 
-The inference function supports these category groups:
+## Kategori yang Didukung
+
+Fungsi inferensi mendukung kategori berikut:
 
 - elektronik
 - hiburan
@@ -201,53 +204,53 @@ The inference function supports these category groups:
 - fashion
 - pertukangan
 
-## Inference
+## Inferensi
 
-The notebook includes a `predict_product()` function that accepts:
+Notebook menyediakan fungsi `predict_product()` yang menerima input:
 
-- product category
-- selling price
-- official store status
-- Gold Merchant status
-- stock
-- rating average
-- discounted price
+- kategori produk
+- harga jual
+- status official store
+- status Gold Merchant
+- stok
+- rating rata-rata
+- harga setelah diskon
 
-It returns:
-- predicted label,
-- probability score,
-- risk level,
-- simple business suggestions.
+Fungsi ini menghasilkan:
+- label prediksi,
+- skor probabilitas,
+- tingkat risiko,
+- saran bisnis sederhana.
 
-### Important Input Note
-The discount input is handled as the **final price after discount** (`discounted_price`), not as a discount percentage.
+### Catatan Penting Input
+Input diskon pada fungsi ini menggunakan **harga setelah diskon** (`discounted_price`), bukan persen diskon.
 
-### Final Inference Logic
-The inference flow uses category statistics and trained feature logic to produce a prediction and a short recommendation message that can be shown in the website.
+### Alur Inferensi
+Alur inferensi menggunakan statistik kategori dan logika fitur yang sama dengan proses training, sehingga output dapat dipakai sebagai bantuan keputusan di website.
 
-## Integration Notes for Full Stack
+## Catatan Integrasi untuk Full Stack
 
-The website / backend should align with the final notebook logic:
+Agar website dan backend selaras dengan notebook final, beberapa hal perlu diperhatikan:
 
-- `discounted_price` must be calculated before sending the request to the model.
-- `TopAds` should not be sent as a model input.
-- `gold_merchant` should be included in the UI / API input.
-- the model input structure should match the final `FEATURE_COLS` used in training.
+- `discounted_price` harus dihitung sebelum dikirim ke model.
+- `TopAds` tidak lagi digunakan sebagai input model.
+- `gold_merchant` perlu ditambahkan ke UI / API input.
+- struktur input model harus sama dengan `FEATURE_COLS` final yang dipakai saat training.
 
-### Example Discount Conversion
-If the frontend receives:
+### Contoh Konversi Diskon
+Jika frontend menerima:
 - `harga_jual = 48000`
 - `diskon_pct = 20`
 
-Then the backend should convert it to:
+maka backend harus mengubahnya menjadi:
 
 `discounted_price = 48000 * (1 - 20 / 100) = 38400`
 
-and send that value into the model.
+lalu nilai tersebut dikirim ke model.
 
-## Exported Artifacts
+## Artefak yang Diekspor
 
-The notebook exports the following files:
+Notebook mengekspor file berikut:
 
 - `tokped_classifier.pkl`
 - `feature_cols.json`
@@ -270,33 +273,33 @@ The notebook exports the following files:
 - SHAP
 - Joblib
 
-## Business Value
+## Manfaat Bisnis
 
-This project helps UMKM sellers:
-- reduce product selection risk,
-- compare product potential more objectively,
-- improve pricing decisions,
-- understand category behavior,
-- make faster, data-driven decisions.
+Proyek ini membantu pelaku UMKM untuk:
+- mengurangi risiko memilih produk,
+- membandingkan potensi produk secara lebih objektif,
+- memperbaiki keputusan harga,
+- memahami perilaku kategori,
+- mengambil keputusan dengan lebih cepat dan berbasis data.
 
-## Limitations
+## Keterbatasan
 
-A few limitations remain in the current version:
+Beberapa keterbatasan yang masih ada pada versi ini:
 
-- some signals are weaker in certain categories,
-- `is_topads` can be misleading if treated as a causal feature,
-- synthetic data is used for the `pertukangan` category,
-- the model is still best treated as an MVP rather than a production-grade forecasting system,
-- product-level explanation text is still rule-based rather than fully SHAP-generated.
+- sinyal model bisa lebih lemah pada kategori tertentu,
+- `is_topads` dapat menghasilkan pola korelasi yang menyesatkan jika diperlakukan sebagai sinyal kausal,
+- data sintetis dipakai untuk kategori `pertukangan`,
+- model masih lebih tepat dianggap sebagai MVP daripada sistem forecasting yang siap produksi penuh,
+- teks rekomendasi pada inferensi belum sepenuhnya SHAP-based untuk level produk individu.
 
-## How to Use
+## Cara Menggunakan
 
-1. Load the exported model and metadata files.
-2. Prepare input data using the same feature logic from the notebook.
-3. Convert discount input to `discounted_price` before inference.
-4. Call the `predict_product()` logic or the model directly.
-5. Use the probability score as a decision-support signal, not as an absolute truth.
+1. Muat file model dan metadata yang diekspor.
+2. Siapkan input data dengan logika fitur yang sama seperti notebook.
+3. Konversi input diskon menjadi `discounted_price` sebelum inferensi.
+4. Panggil logika `predict_product()` atau model secara langsung.
+5. Gunakan skor probabilitas sebagai sinyal bantu pengambilan keputusan, bukan sebagai kebenaran mutlak.
 
-## Project Context
+## Konteks Proyek
 
-This notebook belongs to the **UMKMentor** project for AI-based business intelligence and market insight, focused on helping UMKM sellers make better decisions using product, review, and marketplace data.
+Notebook ini merupakan bagian dari proyek **UMKMentor** untuk business intelligence dan market insights berbasis AI, dengan fokus membantu pelaku UMKM membuat keputusan yang lebih baik berdasarkan data produk, review, dan perilaku marketplace.
