@@ -1,12 +1,12 @@
 # UMKMentor — Product Success Predictor
 
-Proyek machine learning untuk membantu pelaku UMKM memperkirakan apakah sebuah produk berpotensi **laku** atau **tidak laku** sebelum mereka memutuskan untuk stok, memberi diskon, atau mempromosikannya.
+Proyek machine learning untuk memprediksi peluang suatu produk menjadi **laku** atau **tidak laku** berdasarkan data marketplace. Model ini dirancang sebagai alat bantu pengambilan keputusan bagi pelaku UMKM dalam menentukan strategi produk, harga, stok, dan promosi secara lebih berbasis data.
 
 ## Gambaran Umum
 
-Proyek ini membangun model klasifikasi tabular yang memprediksi apakah suatu produk kemungkinan akan memiliki performa penjualan yang baik (`Laku`) atau tidak (`Tidak Laku`) berdasarkan atribut marketplace seperti harga, stok, diskon, rating, sinyal kepercayaan toko, dan statistik level kategori.
+Proyek ini membangun model klasifikasi berbasis machine learning yang memprediksi apakah suatu produk memiliki potensi untuk menjadi produk **Laku** atau **Tidak Laku**.
 
-Proyek ini merupakan bagian dari **UMKMentor**, yaitu solusi AI untuk business intelligence dan market insights yang ditujukan untuk membantu pelaku UMKM mengambil keputusan produk secara lebih berbasis data.
+Prediksi dilakukan menggunakan berbagai atribut marketplace seperti harga, stok, diskon, rating, atribut toko, dan statistik level kategori. Model kemudian digunakan sebagai komponen utama pada **UMKMentor**, sebuah solusi AI untuk Business Intelligence dan Market Insights yang membantu pelaku UMKM mengambil keputusan bisnis secara lebih objektif dan berbasis data.
 
 ## Permasalahan
 
@@ -72,9 +72,9 @@ Dataset memuat:
 
 ## Ekstensi Dataset Sintetis
 
-Dataset Tokopedia asli tidak memiliki representasi yang cukup untuk kategori **Pertukangan**, padahal kategori ini dibutuhkan sebagai salah satu use case dalam UMKMentor.
+Dataset Tokopedia yang digunakan pada proyek ini tidak memiliki representasi yang memadai untuk kategori **Pertukangan**, sementara kategori tersebut diperlukan sebagai salah satu kategori yang didukung oleh UMKMentor.
 
-Untuk mengatasi keterbatasan tersebut, notebook menambahkan **800 baris data sintetis** untuk kategori **Pertukangan** dan menggabungkannya ke dalam dataset pelatihan.
+Untuk mengatasi keterbatasan tersebut, ditambahkan **800 baris data sintetis** kategori Pertukangan yang dirancang menyerupai karakteristik data marketplace nyata dan kemudian digabungkan ke dalam dataset pelatihan model.
 
 ### Alasan Penambahan
 Data sintetis ini dibuat untuk:
@@ -117,7 +117,7 @@ Penggunaan median per kategori membuat label lebih adil dibanding membandingkan 
 
 ## Feature Engineering
 
-Notebook ini membangun fitur-fitur yang menangkap konteks bisnis di marketplace.
+Selain membangun fitur baru berbasis statistik kategori, proses feature engineering juga melibatkan audit fitur menggunakan analisis SHAP dan evaluasi bisnis untuk memastikan bahwa fitur yang digunakan benar-benar relevan terhadap kondisi marketplace.
 
 ### Ide Fitur Utama
 Fitur final mencakup:
@@ -167,6 +167,7 @@ Model final yang dipilih adalah:
 ## Insight Utama dari Notebook
 
 Sinyal paling kuat yang terlihat pada model antara lain:
+
 - `discount_pct`
 - `rating_average`
 - `stock_is_enough`
@@ -180,10 +181,13 @@ Hal ini menunjukkan bahwa strategi diskon, rating produk, kecukupan stok, dan ko
 Notebook ini menggunakan **SHAP** untuk interpretasi global model.
 
 ### Fungsi SHAP di Proyek Ini
-SHAP digunakan untuk:
-- melihat fitur mana yang paling berpengaruh secara keseluruhan,
-- memahami arah pengaruh fitur terhadap prediksi,
-- membantu inspeksi model setelah training.
+Analisis interpretabilitas model dilakukan menggunakan SHAP (SHapley Additive Explanations) untuk memahami kontribusi masing-masing fitur terhadap prediksi model.
+
+Hasil analisis SHAP digunakan untuk:
+- mengidentifikasi fitur yang paling berpengaruh terhadap prediksi,
+- melakukan audit dan evaluasi fitur,
+- mendukung proses perbaikan feature engineering,
+- membantu interpretasi perilaku model setelah proses training.
 
 ### Batasan SHAP pada Implementasi Saat Ini
 Pada notebook final, teks rekomendasi untuk user di fungsi `predict_product()` masih berasal dari **logika aturan bisnis (rule-based)**.
