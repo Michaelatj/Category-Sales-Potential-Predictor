@@ -159,13 +159,15 @@ Selain itu, model juga dituning dan dikalibrasi agar output probabilitas lebih s
 
 ## Model Terbaik
 
-Model final yang dipilih adalah:
+Berdasarkan hasil evaluasi dan perbandingan performa model, model final yang dipilih adalah:
 
-**Gradient Boosting yang sudah dituning dan dikalibrasi (sigmoid)**
+**XGBoost Tuned**
 
 ### Performa Final
-- **Test AUC:** 0.745
-- Output probabilitas dikalibrasi dengan sigmoid agar lebih mudah diinterpretasikan.
+- Cross Validation AUC: 0.799
+- Test AUC: 0.762
+
+Model dipilih berdasarkan nilai Cross Validation AUC tertinggi dengan tetap mempertimbangkan kemampuan generalisasi pada data pengujian.
 
 ## Insight Utama dari Notebook
 
