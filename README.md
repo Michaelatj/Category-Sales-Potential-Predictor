@@ -151,6 +151,9 @@ Beberapa algoritma klasifikasi diuji dalam notebook, yaitu:
 - Linear SVM
 - Random Forest
 - Gradient Boosting
+- XGBoost
+
+Selain itu, model juga dituning dan dikalibrasi agar output probabilitas lebih stabil dan berguna untuk decision support.
 
 Selain itu, model juga dituning dan dikalibrasi agar output probabilitas lebih stabil dan berguna untuk decision support.
 
@@ -271,7 +274,7 @@ Notebook mengekspor file berikut:
 - Pandas
 - NumPy
 - Scikit-learn
-- Gradient Boosting
+- XGBoost
 - Matplotlib
 - Seaborn
 - SHAP
